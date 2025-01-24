@@ -1,16 +1,19 @@
 import React from 'react';
 import { Form, Input, Button, Drawer } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createUser } from '../store/usersSlice';
 
 const UserForm = ({ visible, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const { status } = useSelector((state) => state.users);
 
   const handleSubmit = async (values) => {
-    await dispatch(createUser(values));
-    form.resetFields();
-    onClose();
+    const result = await dispatch(createUser(values));
+    if (!result.error) {
+      form.resetFields();
+      onClose();
+    }
   };
 
   return (
@@ -23,7 +26,11 @@ const UserForm = ({ visible, onClose }) => {
       extra={
         <div style={{ display: 'flex', gap: '8px' }}>
           <Button onClick={onClose}>Cancelar</Button>
-          <Button type="primary" onClick={() => form.submit()}>
+          <Button 
+            type="primary" 
+            onClick={() => form.submit()}
+            loading={status === 'loading'}
+          >
             Guardar
           </Button>
         </div>

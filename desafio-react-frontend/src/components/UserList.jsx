@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Input, Button, Avatar, Popconfirm } from 'antd';
+import { Table, Input, Button, Avatar, Popconfirm, Alert } from 'antd';
 import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { fetchUsers, deleteUser, setCurrentPage, setSearchQuery } from '../store/usersSlice';
+import { fetchUsers, deleteUser, setCurrentPage, setSearchQuery, clearError } from '../store/usersSlice';
 
 const { Search } = Input;
 
 const UserList = ({ onAddUser }) => {
   const dispatch = useDispatch();
-  const { users, status, currentPage, searchQuery } = useSelector((state) => state.users);
+  const { users, status, error, currentPage, searchQuery } = useSelector((state) => state.users);
 
   useEffect(() => {
     dispatch(fetchUsers({ page: currentPage, limit: 10, searchQuery }));
@@ -66,6 +66,18 @@ const UserList = ({ onAddUser }) => {
 
   return (
     <div>
+      {error && (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+          onClose={() => dispatch(clearError())}
+        />
+      )}
+      
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Search
           placeholder="Buscar contactos..."
@@ -77,6 +89,7 @@ const UserList = ({ onAddUser }) => {
           Agregar Contacto
         </Button>
       </div>
+      
       <Table
         dataSource={users}
         columns={columns}
